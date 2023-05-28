@@ -33,10 +33,10 @@ class Saloon(models.Model):
 
 
 class Slot(models.Model):
-    service = models.ForeignKey(Service, on_delete=models.CASCADE)
-    master = models.ForeignKey(Master, on_delete=models.CASCADE)
-    saloon = models.ForeignKey(Saloon, on_delete=models.CASCADE)
-    client = models.ForeignKey(Client, on_delete=models.CASCADE)
+    service = models.ForeignKey(Service, on_delete=models.CASCADE, default=None, null=True)
+    master = models.ForeignKey(Master, on_delete=models.CASCADE, default=None, null=True)
+    saloon = models.ForeignKey(Saloon, on_delete=models.CASCADE, null=True)
+    client = models.ForeignKey(Client, on_delete=models.CASCADE, default=None, null=True, blank=True)
     start_datetime = models.DateTimeField()
 
     def __str__(self):
