@@ -42,16 +42,15 @@ def get_data_keyboard():
     now = datetime.now()
     actual_dates = Slot.objects.filter(start_datetime__gte=now)
     min_date = actual_dates.order_by('start_datetime').first()
-    date = min_date.start_datetime.strftime("%d.%m.%y")
+    date = min_date.start_datetime.strftime("%d.%m.%Y")
     keyboard = [
         [InlineKeyboardButton(date, callback_data=date)],
     ]
     return InlineKeyboardMarkup(keyboard)
 
 
-def get_time_keyboard():
-    now = datetime.now()
-    actual_dates = Slot.objects.filter(start_datetime__gte=now)
+def get_time_keyboard(date: datetime):
+    actual_dates = Slot.objects.filter(start_datetime__gte=date)
     min_date = actual_dates.order_by('start_datetime').first()
     slot_time = min_date.start_datetime.strftime('%H:%M')
     keyboard = [

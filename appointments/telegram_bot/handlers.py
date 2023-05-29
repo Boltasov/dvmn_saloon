@@ -1,4 +1,5 @@
 from re import match
+from datetime import datetime
 
 from telegram import Update
 from telegram.ext import CallbackContext
@@ -7,6 +8,7 @@ from telegram.ext import ConversationHandler
 from appointments.telegram_bot.keyboards import BOOK_SLOT_BUTTON, BOOK_MASTER_BUTTON, ABOUT_BUTTON
 from appointments.telegram_bot.keyboards import get_start_keyboard, get_service_keyboard, get_data_keyboard, \
     get_master_keyboard, get_time_keyboard
+from appointments.models import Slot, Client, Master, Service, Saloon
 
 
 MENU, ASK_SERVICE, ASK_DATE, ASK_TIME, ASK_MASTER, ASK_PHONE = range(6)
@@ -66,10 +68,11 @@ def keyboard_date_handler(update: Update, context: CallbackContext):
     current_text = update.effective_message.text
 
     context.user_data['date'] = data
+    slot_date = datetime.strptime(data, '%d.%m.%Y')
     query.edit_message_text(text=current_text)
     context.bot.send_message(chat_id=chat_id,
                              text='Сервис: {}. Дата: {}. Выбор времени'.format(context.user_data['service'], data),
-                             reply_markup=get_time_keyboard()
+                             reply_markup=get_time_keyboard(slot_date)
                              )
     return ASK_TIME
 
@@ -78,10 +81,11 @@ def message_date_handler(update: Update, context: CallbackContext):
     text = update.message.text
     if match(r'\d\d\.\d\d\.\d\d\d\d', update.message.text):
         context.user_data['date'] = text
+        slot_date = datetime.strptime(text, '%d.%m.%Y')
         context.bot.send_message(chat_id=update.effective_chat.id,
                                  text='Сервис: {}. Дата: {}. Выбор времени'
                                  .format(context.user_data['service'], context.user_data['date']),
-                                 reply_markup=get_time_keyboard()
+                                 reply_markup=get_time_keyboard(slot_date)
                                  )
         return ASK_TIME
     else:
