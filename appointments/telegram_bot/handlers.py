@@ -165,11 +165,10 @@ def phone_handler(update: Update, context: CallbackContext):
         time = datetime.strptime(context.user_data['time'], '%H:%M').time()
         date = datetime.strptime(context.user_data['date'], '%d.%m.%Y').date()
         slot_datetime = datetime.combine(date, time)
-        master = context.user_data['master']
+        master = Master.objects.get(pk=context.user_data['master'])
 
-        slot = Slot.objects.filter(start_datetime=slot_datetime).first()
+        slot = Slot.objects.filter(start_datetime=slot_datetime).filter(master=master).first()
         slot.client, _ = Client.objects.get_or_create(phone_number=phone)
-        slot.master = Master.objects.get(pk=master)
         slot.service = Service.objects.get(pk=service)
         slot.save()
         print('Slot: ', slot.pk, slot.master.pk)

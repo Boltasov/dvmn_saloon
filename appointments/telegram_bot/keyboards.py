@@ -33,14 +33,14 @@ def get_service_keyboard():
     services = Service.objects.all()
     keyboard = []
     for service in services:
-        keyboard.append([InlineKeyboardButton(service.name, callback_data=service.name)])
+        keyboard.append([InlineKeyboardButton(service.name, callback_data=service.pk)])
 
     return InlineKeyboardMarkup(keyboard)
 
 
 def get_data_keyboard():
     now = datetime.now()
-    actual_dates = Slot.objects.filter(start_datetime__gte=now)
+    actual_dates = Slot.objects.filter(start_datetime__gte=now).filter(client=None)
     min_date = actual_dates.order_by('start_datetime').first()
     date = min_date.start_datetime.strftime("%d.%m.%Y")
     keyboard = [
@@ -50,7 +50,7 @@ def get_data_keyboard():
 
 
 def get_time_keyboard(date: datetime):
-    actual_dates = Slot.objects.filter(start_datetime__gte=date)
+    actual_dates = Slot.objects.filter(start_datetime__gte=date).filter(client=None)
     min_date = actual_dates.order_by('start_datetime').first()
     slot_time = min_date.start_datetime.strftime('%H:%M')
     keyboard = [
@@ -63,6 +63,6 @@ def get_master_keyboard():
     masters = Master.objects.all()
     keyboard = []
     for master in masters:
-        keyboard.append([InlineKeyboardButton(master.name, callback_data=master.name)])
+        keyboard.append([InlineKeyboardButton(master.name, callback_data=master.pk)])
 
     return InlineKeyboardMarkup(keyboard)

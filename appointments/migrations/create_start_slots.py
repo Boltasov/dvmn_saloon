@@ -1,5 +1,5 @@
 from django.db import migrations, models
-from appointments.models import Slot, Saloon
+from appointments.models import Slot, Saloon, Master
 
 from datetime import datetime, date, timedelta, time
 
@@ -11,12 +11,15 @@ WORK_STARTING_HOUR = 9
 def create_starting_slots(apps, schema_editor):
     saloon = Saloon.objects.create(name='Дефолт-салон', address='Дефолт-сити, улица Дефолт, 25')
     today = date.today()
-    for day in range(NUMBER_OF_AVAILABLE_DAYS):
-        this_date = today + timedelta(days=day)
-        base_datetime = datetime.combine(this_date, time.min) + timedelta(hours=WORK_STARTING_HOUR)
-        for slot in range(SLOTS_PER_DAY):
-            slot_datetime = base_datetime + timedelta(minutes=30)*slot
-            Slot.objects.create(saloon=saloon, start_datetime=slot_datetime)
+    for master_name in ['Ольга', 'Татьяна']:
+        master = Master(name=master_name)
+        master.save()
+        for day in range(NUMBER_OF_AVAILABLE_DAYS):
+            this_date = today + timedelta(days=day)
+            base_datetime = datetime.combine(this_date, time.min) + timedelta(hours=WORK_STARTING_HOUR)
+            for slot in range(SLOTS_PER_DAY):
+                slot_datetime = base_datetime + timedelta(minutes=30)*slot
+                Slot.objects.create(saloon=saloon, start_datetime=slot_datetime, master=master)
 
 
 class Migration(migrations.Migration):
