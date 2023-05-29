@@ -2,7 +2,6 @@ from datetime import datetime
 
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from appointments.models import Slot, Master, Service
-from django.db.models import Min
 
 
 BOOK_SLOT_BUTTON = 'book'
