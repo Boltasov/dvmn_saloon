@@ -27,6 +27,8 @@ def keyboard_menu_handler(update: Update, context: CallbackContext):
     chat_id = update.effective_message.chat_id
     current_text = update.effective_message.text
 
+    context.user_data['master'] = None
+
     if data == BOOK_SLOT_BUTTON:
         context.user_data['way'] = 'slot'
         query.edit_message_text(text=current_text)
@@ -56,7 +58,7 @@ def keyboard_service_handler(update: Update, context: CallbackContext):
     query.edit_message_text(text=current_text)
     context.bot.send_message(chat_id=chat_id,
                              text=f'Сервис: {data} Выбор даты',
-                             reply_markup=get_data_keyboard()
+                             reply_markup=get_data_keyboard(context.user_data['master'])
                              )
     return ASK_DATE
 
@@ -72,7 +74,7 @@ def keyboard_date_handler(update: Update, context: CallbackContext):
     query.edit_message_text(text=current_text)
     context.bot.send_message(chat_id=chat_id,
                              text='Сервис: {}. Дата: {}. Выбор времени'.format(context.user_data['service'], data),
-                             reply_markup=get_time_keyboard(slot_date)
+                             reply_markup=get_time_keyboard(slot_date, context.user_data['master'])
                              )
     return ASK_TIME
 
@@ -85,7 +87,7 @@ def message_date_handler(update: Update, context: CallbackContext):
         context.bot.send_message(chat_id=update.effective_chat.id,
                                  text='Сервис: {}. Дата: {}. Выбор времени'
                                  .format(context.user_data['service'], context.user_data['date']),
-                                 reply_markup=get_time_keyboard(slot_date)
+                                 reply_markup=get_time_keyboard(slot_date, context.user_data['master'])
                                  )
         return ASK_TIME
     else:

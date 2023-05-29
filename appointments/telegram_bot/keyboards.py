@@ -38,9 +38,12 @@ def get_service_keyboard():
     return InlineKeyboardMarkup(keyboard)
 
 
-def get_data_keyboard():
+def get_data_keyboard(master=None):
     now = datetime.now()
-    actual_dates = Slot.objects.filter(start_datetime__gte=now).filter(client=None)
+    if master:
+        actual_dates = Slot.objects.filter(start_datetime__gte=now).filter(client=None).filter(master=master)
+    else:
+        actual_dates = Slot.objects.filter(start_datetime__gte=now).filter(client=None)
     min_date = actual_dates.order_by('start_datetime').first()
     date = min_date.start_datetime.strftime("%d.%m.%Y")
     keyboard = [
@@ -49,8 +52,11 @@ def get_data_keyboard():
     return InlineKeyboardMarkup(keyboard)
 
 
-def get_time_keyboard(date: datetime):
-    actual_dates = Slot.objects.filter(start_datetime__gte=date).filter(client=None)
+def get_time_keyboard(date: datetime, master=None):
+    if master:
+        actual_dates = Slot.objects.filter(start_datetime__gte=date).filter(client=None).filter(master=master)
+    else:
+        actual_dates = Slot.objects.filter(start_datetime__gte=date).filter(client=None)
     min_date = actual_dates.order_by('start_datetime').first()
     slot_time = min_date.start_datetime.strftime('%H:%M')
     keyboard = [
