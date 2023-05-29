@@ -57,7 +57,8 @@ def keyboard_service_handler(update: Update, context: CallbackContext):
     context.user_data['service'] = data
     query.edit_message_text(text=current_text)
     context.bot.send_message(chat_id=chat_id,
-                             text=f'Сервис: {data} Выбор даты',
+                             text='Выберите дату, либо введите дату в формате: dd.mm.yyyy. '
+                                  'Запись возможна только на 2 недели вперёд',
                              reply_markup=get_data_keyboard(context.user_data['master'])
                              )
     return ASK_DATE
@@ -73,7 +74,8 @@ def keyboard_date_handler(update: Update, context: CallbackContext):
     slot_date = datetime.strptime(data, '%d.%m.%Y')
     query.edit_message_text(text=current_text)
     context.bot.send_message(chat_id=chat_id,
-                             text='Сервис: {}. Дата: {}. Выбор времени'.format(context.user_data['service'], data),
+                             text='Выберите время или введите время в формате hh:mm. Салон работает с 09:00 до 18:00. '
+                                  'Запись возможна каждые полчаса',
                              reply_markup=get_time_keyboard(slot_date, context.user_data['master'])
                              )
     return ASK_TIME
@@ -85,8 +87,9 @@ def message_date_handler(update: Update, context: CallbackContext):
         context.user_data['date'] = text
         slot_date = datetime.strptime(text, '%d.%m.%Y')
         context.bot.send_message(chat_id=update.effective_chat.id,
-                                 text='Сервис: {}. Дата: {}. Выбор времени'
-                                 .format(context.user_data['service'], context.user_data['date']),
+                                 text='Выберите время или введите время в формате hh:mm. '
+                                      'Салон работает с 09:00 до 18:00. '
+                                      'Запись возможна каждые полчаса',
                                  reply_markup=get_time_keyboard(slot_date, context.user_data['master'])
                                  )
         return ASK_TIME
@@ -106,7 +109,7 @@ def keyboard_time_handler(update: Update, context: CallbackContext):
     query.edit_message_text(text=current_text)
     if context.user_data['way'] == 'slot':
         context.bot.send_message(chat_id=chat_id,
-                                 text='Сервис: {}. Дата: {}. Время: {}. Выберите мастера:'
+                                 text='Выберите мастера:'
                                  .format(context.user_data['service'], context.user_data['date'], data),
                                  reply_markup=get_master_keyboard()
                                  )
@@ -123,7 +126,7 @@ def message_time_handler(update: Update, context: CallbackContext):
         context.user_data['time'] = text
         if context.user_data['way'] == 'slot':
             context.bot.send_message(chat_id=chat_id,
-                                     text='Сервис: {}. Дата: {}. Время: {}. Выберите мастера:'
+                                     text='Выберите мастера:'
                                      .format(context.user_data['service'],
                                              context.user_data['date'],
                                              context.user_data['time']),
@@ -149,7 +152,7 @@ def keyboard_master_handler(update: Update, context: CallbackContext):
     query.edit_message_text(text=current_text)
     if context.user_data['way'] == 'slot':
         context.bot.send_message(chat_id=chat_id,
-                                 text='Сервис: {}. Дата: {}. Время: {}. Мастер: {}. Укажите телефон:'
+                                 text='Укажите телефон (11 цифр без каких-либо знаков):'
                                  .format(context.user_data['service'], context.user_data['date'],
                                          context.user_data['time'], data)
                                  )
@@ -163,7 +166,7 @@ def phone_handler(update: Update, context: CallbackContext):
     text = update.message.text
     if text.isnumeric() and len(text) == 11:
         phone = update.message.text
-        service = context.user_data['service']
+        service = Service.objects.get(pk=context.user_data['service'])
         time = datetime.strptime(context.user_data['time'], '%H:%M').time()
         date = datetime.strptime(context.user_data['date'], '%d.%m.%Y').date()
         slot_datetime = datetime.combine(date, time)
@@ -171,7 +174,7 @@ def phone_handler(update: Update, context: CallbackContext):
 
         slot = Slot.objects.filter(start_datetime=slot_datetime).filter(master=master).first()
         slot.client, _ = Client.objects.get_or_create(phone_number=phone)
-        slot.service = Service.objects.get(pk=service)
+        slot.service = service
         slot.save()
         print('Slot: ', slot.pk, slot.master.pk)
 
