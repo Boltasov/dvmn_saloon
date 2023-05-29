@@ -4,8 +4,8 @@ from telegram import Update
 from telegram.ext import CallbackContext
 from telegram.ext import ConversationHandler
 
-from keyboards import BOOK_SLOT_BUTTON, BOOK_MASTER_BUTTON, ABOUT_BUTTON
-from keyboards import get_start_keyboard, get_service_keyboard, get_data_keyboard, \
+from appointments.telegram_bot.keyboards import BOOK_SLOT_BUTTON, BOOK_MASTER_BUTTON, ABOUT_BUTTON
+from appointments.telegram_bot.keyboards import get_start_keyboard, get_service_keyboard, get_data_keyboard, \
     get_master_keyboard, get_time_keyboard
 
 

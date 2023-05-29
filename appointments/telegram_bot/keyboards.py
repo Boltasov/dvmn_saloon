@@ -1,4 +1,8 @@
+from datetime import datetime
+
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
+from appointments.models import Slot, Master, Service
+from django.db.models import Min
 
 
 BOOK_SLOT_BUTTON = 'book'
@@ -27,35 +31,40 @@ def get_start_keyboard():
 
 
 def get_service_keyboard():
-    keyboard = [
-        [InlineKeyboardButton('Мейкап', callback_data='Мейкап')],
-        [InlineKeyboardButton('Покраска', callback_data='Покраска')],
-        [InlineKeyboardButton('Маникюр', callback_data='Маникюр')]
-    ]
+    services = Service.objects.all()
+    keyboard = []
+    for service in services:
+        keyboard.append([InlineKeyboardButton(service.name, callback_data=service.name)])
+
     return InlineKeyboardMarkup(keyboard)
 
 
 def get_data_keyboard():
+    now = datetime.now()
+    actual_dates = Slot.objects.filter(start_datetime__gte=now)
+    min_date = actual_dates.order_by('start_datetime').first()
+    date = min_date.start_datetime.strftime("%d.%m.%y")
     keyboard = [
-        [InlineKeyboardButton('01.06', callback_data='01.06')],
-        [InlineKeyboardButton('02.06', callback_data='02.06')],
-        [InlineKeyboardButton('03.06', callback_data='03.06')]
+        [InlineKeyboardButton(date, callback_data=date)],
     ]
     return InlineKeyboardMarkup(keyboard)
 
 
 def get_time_keyboard():
+    now = datetime.now()
+    actual_dates = Slot.objects.filter(start_datetime__gte=now)
+    min_date = actual_dates.order_by('start_datetime').first()
+    slot_time = min_date.start_datetime.strftime('%H:%M')
     keyboard = [
-        [InlineKeyboardButton('10:00', callback_data='10:00')],
-        [InlineKeyboardButton('10:30', callback_data='10:30')],
-        [InlineKeyboardButton('12:00', callback_data='12:00')]
+        [InlineKeyboardButton(slot_time, callback_data=slot_time)]
     ]
     return InlineKeyboardMarkup(keyboard)
 
 
 def get_master_keyboard():
-    keyboard = [
-        [InlineKeyboardButton('Ольга', callback_data='Ольга')],
-        [InlineKeyboardButton('Татьяна', callback_data='Татьяна')]
-    ]
+    masters = Master.objects.all()
+    keyboard = []
+    for master in masters:
+        keyboard.append([InlineKeyboardButton(master.name, callback_data=master.name)])
+
     return InlineKeyboardMarkup(keyboard)
