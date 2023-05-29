@@ -134,7 +134,7 @@ def message_time_handler(update: Update, context: CallbackContext):
     else:
         context.bot.send_message(chat_id=update.effective_chat.id,
                                  text='Бот не очень умный. Введите, пожалуйста, время в формате: "hh:mm"\n'
-                                      'Например: 10:30')
+                                      'Например: 14:30')
 
 
 def keyboard_master_handler(update: Update, context: CallbackContext):
@@ -160,14 +160,27 @@ def keyboard_master_handler(update: Update, context: CallbackContext):
 def phone_handler(update: Update, context: CallbackContext):
     text = update.message.text
     if text.isnumeric() and len(text) == 11:
-        context.user_data['phone'] = update.message.text
+        phone = update.message.text
+        service = context.user_data['service']
+        time = datetime.strptime(context.user_data['time'], '%H:%M').time()
+        date = datetime.strptime(context.user_data['date'], '%d.%m.%Y').date()
+        slot_datetime = datetime.combine(date, time)
+        master = context.user_data['master']
+
+        slot = Slot.objects.filter(start_datetime=slot_datetime).first()
+        slot.client, _ = Client.objects.get_or_create(phone_number=phone)
+        slot.master = Master.objects.get(pk=master)
+        slot.service = Service.objects.get(pk=service)
+        slot.save()
+        print('Slot: ', slot.pk, slot.master.pk)
+
         context.bot.send_message(chat_id=update.effective_chat.id,
-                                 text="Успешная запись\n\nСервис: {}.\nВремя: {} {}.\nМастер: {}.\nТелефон: {}"
-                                 .format(context.user_data['service'],
+                                 text="Успешная запись\n\nСервис: {}.\nВремя: {} {}.\nМастер: {}.\nВаш телефон: {}"
+                                 .format(service,
                                          context.user_data['date'],
                                          context.user_data['time'],
-                                         context.user_data['master'],
-                                         context.user_data['phone'])
+                                         master,
+                                         phone)
                                  )
         context.bot.send_message(chat_id=update.effective_chat.id,
                                  text="Можете создать ещё одну запись с помощью команды /start.")
