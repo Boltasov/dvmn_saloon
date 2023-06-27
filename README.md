@@ -24,6 +24,11 @@ python manage.py makemigrations
 ```commandline
 python manage.py migrate
 ```
+Создайте файл `.env` в корневой папке и доавьте туда ключ API для созданного вами бота:
+```commandline
+TG_KEY=ваш_ключ
+```
+[Как получить токен](https://parsemachine.com/articles/gde-najti-token-bota-telegram-api/)
 
 Запустите командой 
 ```

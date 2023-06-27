@@ -1,3 +1,5 @@
+from environs import Env
+
 from telegram.ext import Updater
 from telegram.ext import CommandHandler, CallbackQueryHandler, ConversationHandler
 from telegram.ext import MessageHandler, Filters
@@ -7,8 +9,9 @@ from appointments.telegram_bot.handlers import start, keyboard_menu_handler, key
     phone_handler, cancel_handler
 from appointments.telegram_bot.handlers import MENU, ASK_SERVICE, ASK_DATE, ASK_TIME, ASK_MASTER, ASK_PHONE
 
-
-API_TOKEN = '6230042552:AAHISknbBHIk3uni-Nd7Tx1ngzh0nzH2LpI'
+env = Env()
+env.read_env()
+API_TOKEN = env('TG_KEY')
 
 
 def start_bot():
